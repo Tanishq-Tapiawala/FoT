@@ -16,7 +16,6 @@ Created on Tue Mar 23 18:15:43 2021
 
 import Metrica_IO as mio
 import Metrica_Viz as mviz
-import numpy as np
 
 # Setting up the initial path
 datadir = '../Metrica/sample-data-master/data'
@@ -55,6 +54,8 @@ print(home_shots['From'].value_counts())
 print(away_shots['From'].value_counts())
 
 # Getting the shots that were a goal
+goals = shots[shots['Subtype'].str.contains('-GOAL')].copy()
+
 home_goals = home_shots[home_shots['Subtype'].str.contains('-GOAL')].copy()
 away_goals = away_shots[away_shots['Subtype'].str.contains('-GOAL')].copy()
 
@@ -127,13 +128,20 @@ fig, ax = mviz.plot_frame(tracking_home.loc[goal1_frame], tracking_away.loc[goal
 
 # 1
 
-# Goal 2 => 1118
-# Frame 1115, 1116 => pass
-# Frame 1117 => header won frame
-fig, ax = mviz.plot_events(events.loc[1118:1118], indicators = ['Marker','Arrow'], annotate=True)
-mviz.plot_events(events.loc[1115:1116], indicators = ['Marker','Arrow'], annotate=True, figax=(fig,ax))
+# Overall 2nd Goal was by the Away team 
+# Goal 1(Away) => 823
+# Pass started at frame 818
+mviz.plot_events(events.loc[818:823], indicators = ['Marker','Arrow'], annotate=True, color='b')
 
-# Goal 3 => 1723
+# Goal 2(Home) => 1118
+# Pass starts at frame 1109
+mviz.plot_events(events.loc[1109:1118], indicators = ['Marker','Arrow'], annotate=True)
+# But as there are some challenges mid-play, the graph is blurred 
+# So we only consider the shot and pass 
+goal2 = events[events['Type'].isin(['SHOT', 'PASS'])]
+mviz.plot_events(goal2.loc[1109:1118], indicators = ['Marker','Arrow'], annotate=True)
+
+# Goal 3(Home) => 1723
 # Pass start at 1718
 # Frame 1721 is an Away frame, thats why we need to split
 fig, ax = mviz.plot_events(events.loc[1723:1723], indicators = ['Marker','Arrow'], annotate=True)
@@ -151,8 +159,8 @@ for index1 in player9_shot_index:
         ax.plot(events.loc[index1]['Start X'], events.loc[index1]['Start Y'], 'b^', alpha=0.8, ms=9)
     else:
         ax.plot(events.loc[index1]['Start X'], events.loc[index1]['Start Y'], 'ro', alpha=0.4, ms=7)
-
-
+        
+        
 # 3
 
 # Player9 goal => 1118
@@ -162,17 +170,4 @@ fig, ax = mviz.plot_frame(tracking_home.loc[goal2_frame], tracking_away.loc[goal
 
 
 # 4
-dist = 0.0
-for i in range (1, 141156):
-    dist += np.sqrt((tracking_home['Home_11_x'].loc[i] - tracking_home['Home_11_x'].loc[i+1]) ** 2 + (tracking_home['Home_11_y'].loc[i] - tracking_home['Home_11_y'].loc[i+1]) ** 2)
-
-
-
-
-
-
-
-
-
-
-
+# Solution in LoT - 02
